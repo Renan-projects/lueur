@@ -85,13 +85,10 @@ impl AuraMainboard {
             effect += 1;
         }
         const ARGB_ZONES: [&str; 8] = ["argb1", "argb2", "argb3", "argb4", "argb5", "argb6", "argb7", "argb8"];
-        let mut first_led = onboard_leds;
-        for (i, zone) in ARGB_ZONES.iter().enumerate().take(usize::from(argb_headers)) {
-            board
-                .channels
-                .push(Channel { effect, first_led, leds: 1, zone, label: format!("en-tête ARGB {}", i + 1) });
-            effect += 1;
-            first_led += 1;
+        for (i, zone) in (0u8..).zip(ARGB_ZONES.iter().take(usize::from(argb_headers))) {
+            let first_led = onboard_leds.saturating_add(i);
+            let label = format!("en-tête ARGB {}", i + 1);
+            board.channels.push(Channel { effect: effect + i, first_led, leds: 1, zone, label });
         }
 
         // Switch the controller to the protocol generation used below.
